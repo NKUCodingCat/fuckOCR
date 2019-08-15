@@ -1,0 +1,79 @@
+<label>Image File:</label><br />
+<input type="file" id="imageLoader" name="imageLoader" />
+干扰数量<input id="discount" type="range" min="0.001" max="0.1" step="any" />
+干扰尺寸<input id="dissize" type="range" min="0.001" max="0.1" step="any" />
+<canvas id="imageCanvas"></canvas>
+<script>
+    var imageLoader = document.getElementById('imageLoader');
+    imageLoader.addEventListener('change', handleImage, false);
+    var canvas = document.getElementById('imageCanvas');
+    var ctx = canvas.getContext('2d');
+    var _reloadImg = function () { }
+
+    function handleImage(e) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            var img = new Image();
+            img.onload = function () {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                _reloadImg = function () {
+                    ctx.drawImage(img, 0, 0);
+                }
+                document.getElementById('discount').onchange = function () { _reloadImg(); distrubImage(); }
+                document.getElementById('discount').oninput = function () { _reloadImg(); distrubImage(); }
+                document.getElementById('dissize').onchange = function () { _reloadImg(); distrubImage(); }
+                document.getElementById('dissize').oninput = function () { _reloadImg(); distrubImage(); }
+
+                distrubImage(e);
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function distrubImage(e) {
+        w = canvas.width
+        h = canvas.height
+
+        var LENGTH = document.getElementById('dissize').value
+        var COUNT = document.getElementById('discount').value
+
+        length = LENGTH * (Math.pow((Math.pow(w, 2) + Math.pow(h, 2)), 0.5))
+        count = Math.floor((w * h * COUNT) / length)
+
+        ctx.beginPath();
+        for (step = 0; step < count; step++) {
+
+            randX = Math.random() * w
+            randY = Math.random() * h
+
+            _size = (0.2 + 1.6 * Math.random()) * length
+
+            direct = Math.random() * 6.28
+            dX = _size * Math.sin(direct)
+            dY = _size * Math.cos(direct)
+
+            drawline(randX, randY, randX + dX, randY + dY)
+            drawellipse(randX, randY, randX + dX, randY + dY)
+        }
+        ctx.stroke();
+
+    }
+
+    function drawline(startx, starty, endx, endy, color = "#000000") {
+        ctx.strokeStyle = color
+        ctx.moveTo(startx, starty);
+        ctx.lineTo(endx, endy);
+    }
+    function drawellipse(startx, starty, endx, endy, color = "#000000") {
+        ctx.strokeStyle = color
+        ctx.ellipse(
+            0.5 * (startx + endx), 0.5 * (starty + endy),
+            0.5 * (Math.abs(startx - endx)), 0.5 * (Math.abs(starty - endy)),
+            0, 0, 6.28
+        )
+    }
+</script>
