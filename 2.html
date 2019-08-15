@@ -1,7 +1,8 @@
 <label>Image File:</label><br />
 <input type="file" id="imageLoader" name="imageLoader" />
-干扰数量<input id="discount" type="range" min="0.001" max="0.1" step="any" />
-干扰尺寸<input id="dissize" type="range" min="0.001" max="0.1" step="any" />
+<button type="button" id="dwn">下载图片</button>
+干扰数量<input id="discount" type="range" min="0.001" max="0.1" step="any" value="0.003" />
+干扰尺寸<input id="dissize" type="range" min="0.001" max="0.2" step="any" value="0.1" />
 <canvas id="imageCanvas"></canvas>
 <script>
     var imageLoader = document.getElementById('imageLoader');
@@ -61,6 +62,22 @@
         }
         ctx.stroke();
 
+    }
+
+    // Convert canvas to image
+    document.getElementById('dwn').addEventListener("click", function (e) {
+        downloadImage("114514.jpg")
+    });
+
+    // Save | Download image
+    function downloadImage(filename = 'untitled.jpg') {
+        var link = document.createElement('a');
+        canvas.toBlob(function (blob) {
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+        }, 'image/jpeg', 0.6);
     }
 
     function drawline(startx, starty, endx, endy, color = "#000000") {
